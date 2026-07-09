@@ -1,0 +1,8 @@
+(catpred) li@li-ThinkStation-P3-Tower-Gen-2:~/CatPred-main$ python 00_input.py 
+
+(catpred) li@li-ThinkStation-P3-Tower-Gen-2:~/CatPred-main$ python predict.py   --test_path demo/batch_kcat_input.csv   --preds_path output/demo_kcat_preds_full.csv   --checkpoint_paths     data/pretrained/production/kcat/fold_0/model_0/model.pt     data/pretrained/production/kcat/fold_0/model_1/model.pt     data/pretrained/production/kcat/fold_0/model_2/model.pt     data/pretrained/production/kcat/fold_0/model_3/model.pt     data/pretrained/production/kcat/fold_0/model_4/model.pt     data/pretrained/production/kcat/fold_0/model_5/model.pt     data/pretrained/production/kcat/fold_0/model_6/model.pt     data/pretrained/production/kcat/fold_0/model_7/model.pt     data/pretrained/production/kcat/fold_0/model_8/model.pt     data/pretrained/production/kcat/fold_0/model_9/model.pt   --protein_records_path demo/batch_kcat_input.json   --smiles_columns SMILES   --individual_ensemble_predictions   --no_cuda
+   
+(catpred) li@li-ThinkStation-P3-Tower-Gen-2:~/CatPred-main$ python 01_add_column.py
+
+
+
