@@ -1,0 +1,88 @@
+python << 'EOF'
+import pandas as pd
+
+df = pd.read_csv('demo/legu416_input.csv')
+
+# 清洗序列
+df['sequence'] = df['sequence'].apply(lambda x: ''.join(x.split()))
+
+# 检查清洗后是否还有问题
+pdb_groups = df.groupby('pdbpath')['sequence'].apply(set)
+for pdb, seqs in pdb_groups.items():
+    if len(seqs) > 1:
+        print(f"❌ {pdb} 仍有不同序列")
+        for i, seq in enumerate(seqs):
+            print(f"  序列{i+1}: {seq[:50]}...")
+    else:
+        print(f"✅ {pdb} 序列一致")
+
+# 保存清洗后的 CSV
+df.to_csv('demo/legu416_input_clean.csv', index=False)
+print("\n已保存清洗后的 CSV: demo/legu02_input_clean.csv")
+EOF
+
+
+
+
+python << 'EOF'
+import json
+import pandas as pd
+
+df = pd.read_csv('demo/legu02_input.csv')
+
+# 清洗序列
+df['sequence'] = df['sequence'].apply(lambda x: ''.join(x.split()))
+
+# 去重，每个 pdbpath 只保留一条
+unique_proteins = df[['pdbpath', 'sequence']].drop_duplicates(subset='pdbpath')
+
+records = {}
+for _, row in unique_proteins.iterrows():
+    records[row['pdbpath']] = {
+        'seq': row['sequence'],
+        'pdbpath': row['pdbpath']
+    }
+
+# 直接保存到当前目录（与命令中的路径一致）
+with open('legu02_protein.json', 'w') as f:
+    json.dump(records, f, indent=2)
+
+print(f"✅ 已创建 {len(records)} 个蛋白质记录")
+for key in records:
+    print(f"  {key}: 序列长度 {len(records[key]['seq'])}")
+EOF
+
+
+
+#kcat
+python predict.py \
+  --test_path demo/legu416_input_clean.csv \
+  --preds_path output/legu416_output.csv \
+  --checkpoint_paths \
+    data/pretrained/production/kcat/fold_0/model_0/model.pt \
+    data/pretrained/production/kcat/fold_0/model_1/model.pt \
+    data/pretrained/production/kcat/fold_0/model_2/model.pt \
+    data/pretrained/production/kcat/fold_0/model_3/model.pt \
+    data/pretrained/production/kcat/fold_0/model_4/model.pt \
+    data/pretrained/production/kcat/fold_0/model_5/model.pt \
+    data/pretrained/production/kcat/fold_0/model_6/model.pt \
+    data/pretrained/production/kcat/fold_0/model_7/model.pt \
+    data/pretrained/production/kcat/fold_0/model_8/model.pt \
+    data/pretrained/production/kcat/fold_0/model_9/model.pt \
+  --protein_records_path legu02_protein.json \
+  --smiles_columns SMILES \
+  --individual_ensemble_predictions \
+  --no_cuda
+  
+  
+  
+ #km 
+  (catpred) li@li-ThinkStation-P3-Tower-Gen-2:~/CatPred-main$ python predict.py   --test_path demo/legu02_input_clean.csv   --preds_path output/legu02_output_km.csv   --checkpoint_paths     data/pretrained/production/km/fold_0/model_0/model.pt     data/pretrained/production/km/fold_0/model_1/model.pt     data/pretrained/production/km/fold_0/model_2/model.pt     data/pretrained/production/km/fold_0/model_3/model.pt     data/pretrained/production/km/fold_0/model_4/model.pt     data/pretrained/production/km/fold_0/model_5/model.pt     data/pretrained/production/km/fold_0/model_6/model.pt     data/pretrained/production/km/fold_0/model_7/model.pt     data/pretrained/production/km/fold_0/model_8/model.pt     data/pretrained/production/km/fold_0/model_9/model.pt   --protein_records_path legu02_protein.json   --smiles_columns SMILES   --individual_ensemble_predictions   --no_cuda
+   
+   
+#ki   
+ (catpred) li@li-ThinkStation-P3-Tower-Gen-2:~/CatPred-main$ python predict.py   --test_path demo/legu02_input_clean.csv   --preds_path output/legu02_output_ki.csv   --checkpoint_paths     data/pretrained/production/ki/fold_0/model_0/model.pt     data/pretrained/production/ki/fold_0/model_1/model.pt     data/pretrained/production/ki/fold_0/model_2/model.pt     data/pretrained/production/ki/fold_0/model_3/model.pt     data/pretrained/production/ki/fold_0/model_4/model.pt     data/pretrained/production/ki/fold_0/model_5/model.pt     data/pretrained/production/ki/fold_0/model_6/model.pt     data/pretrained/production/ki/fold_0/model_7/model.pt     data/pretrained/production/ki/fold_0/model_8/model.pt     data/pretrained/production/ki/fold_0/model_9/model.pt   --protein_records_path legu02_protein.json   --smiles_columns SMILES   --individual_ensemble_predictions   --no_cuda
+ 
+(catpred) li@li-ThinkStation-P3-Tower-Gen-2:~/CatPred-main$ python 01_add_column_kcat.py 
+(catpred) li@li-ThinkStation-P3-Tower-Gen-2:~/CatPred-main$ python 02_add_column_ki.py 
+(catpred) li@li-ThinkStation-P3-Tower-Gen-2:~/CatPred-main$ python 03_add_column_km.py 
